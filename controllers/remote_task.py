@@ -51,19 +51,24 @@ class RemoteTaskController(http.Controller):
 
 
 # 1. Get auth cookie:
-# localhost:8069/web/session/authenticate
-# {
-#   "jsonrpc": "2.0",
-#   "params": {
-#     "db": "odoo_db",
-#     "login": "task_bot",
-#     "password": "task_bot"
-#   }
+# url = 'https://test.krp-crm.site/web/session/authenticate'
+# body = {
+#     "jsonrpc": "2.0",
+#     "method": "call",
+#     "params": {
+#         "db": "odoo_db",
+#         "login": "task_bot",
+#         "password": "Task_b0t!",
+#     }
 # }
-# response:
+
+
 # get from HEADERS:
 # headers["Set-Cookie"] : session_id=EzMoKXmsTZXd4JT9M4mdPhJrM-UQwLpWCvWK1VnN7S6hBGpsMBk-WxLre3bb9zGgNRCCk0fZSWzDBilfMPM7; Expires=Thu, 26 Nov 2026 10:47:44 GMT; Max-Age=604800; HttpOnly; Path=/
-# take  "session_id=EzMoKXmsTZXd4JT9M4mdPhJrM-UQwLpWCvWK1VnN7S6hBGpsMBk-WxLre3bb9zGgNRCCk0fZSWzDBilfMPM7"
+
+# res = requests.post(url=url, json=body)
+# cook = res.headers.get('Set-Cookie')
+# cook_sid = cook.split(';')[1] # take id only from "session_id=EzMoKXmsTZXd4JT9M4mdPhJrM-UQwLpWCvWK1VnN7S6hBGpsMBk-WxLre3bb9zGgNRCCk0fZSWzDBilfMPM7"
 
 # and put to other requests headers:
 # Cookie: session_id=EzMoKXmsTZXd4JT9M4mdPhJrM-UQwLpWCvWK1VnN7S6hBGpsMBk-WxLre3bb9zGgNRCCk0fZSWzDBilfMPM7
@@ -76,10 +81,9 @@ class RemoteTaskController(http.Controller):
 #     "jsonrpc": "2.0",
 #     "method": "call",
 #     "params": {
-#         "name": "Назва завдання",
+#         "name": "Task name",
 #         "project_id": 1,
-#         "cr_user_id": 8,
-#         "description": "Вхідні дані",
+#         "description": "This text will go to Вхідні дані",
 #         "attachments": [
 #             {
 #                 "filename": "image.png",
