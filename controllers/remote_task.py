@@ -49,17 +49,6 @@ class RemoteTaskController(http.Controller):
 
         return f"<img src='{pick.image_src}' alt='It`s Alive!'/>"
 
-    @http.route(route='/api/check_health', type='http', auth='public', csrf=False)
-    def check_health(self):
-        return """
-<iframe width="420" height="315"
-        src="https://www.youtube.com/embed/qn9FkoqYgI4?autoplay=1"
-        title="YouTube video"
-        frameborder="0"
-        allow="autoplay; encrypted-media; picture-in-picture"
-        allowfullscreen>
-</iframe>
-"""
 
 # 1. Get auth cookie:
 # localhost:8069/web/session/authenticate
