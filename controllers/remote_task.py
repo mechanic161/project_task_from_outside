@@ -1,6 +1,6 @@
 from odoo import http
 from odoo.http import request
-import requests
+from odoo.tools import config
 
 
 class RemoteTaskController(http.Controller):
@@ -16,7 +16,7 @@ class RemoteTaskController(http.Controller):
         # Main task data
         vals = {
             'name': payload.get('name') or 'No title',
-            'project_id': payload.get('project_id'),
+            'project_id': config.get("project_id_for_custom_fields"),
             'partner_id': None,
             'user_ids': None,
             'description': payload.get('description'),
@@ -45,9 +45,25 @@ class RemoteTaskController(http.Controller):
 
     @http.route(route='/api/health', type='http', auth='user', methods=['GET'])
     def health(self):
-        pick = request.env['ir.attachment'].search([('id', '=', '985')])
+        pick = request.env['ir.attachment'].search([('id', '=', '11277')])
 
         return f"<img src='{pick.image_src}' alt='It`s Alive!'/>"
+
+    @http.route(route='/api/update_lists', type='http', auth='user', methods=['GET'])
+    def update_lists(self):
+        setting = request.env['project.unit.settings'].search([])
+
+        try:
+            setting.get_units_data()
+            setting.get_data_type_data()
+            setting.get_docs_folders()
+            setting.get_doc_sources_data()
+            setting.get_out_docs_folders()
+            return request.make_response(data="ok", status=200)
+        except Exception as ex:
+            return request.make_response(data=ex.args, status=500)
+
+
 
 
 # 1. Get auth cookie:
@@ -61,19 +77,19 @@ class RemoteTaskController(http.Controller):
 #         "password": "Task_b0t!",
 #     }
 # }
-
-
+#
+#
 # get from HEADERS:
 # headers["Set-Cookie"] : session_id=EzMoKXmsTZXd4JT9M4mdPhJrM-UQwLpWCvWK1VnN7S6hBGpsMBk-WxLre3bb9zGgNRCCk0fZSWzDBilfMPM7; Expires=Thu, 26 Nov 2026 10:47:44 GMT; Max-Age=604800; HttpOnly; Path=/
-
+#
 # res = requests.post(url=url, json=body)
 # cook = res.headers.get('Set-Cookie')
 # cook_sid = cook.split(';')[1] # take id only from "session_id=EzMoKXmsTZXd4JT9M4mdPhJrM-UQwLpWCvWK1VnN7S6hBGpsMBk-WxLre3bb9zGgNRCCk0fZSWzDBilfMPM7"
-
+#
 # and put to other requests headers:
 # Cookie: session_id=EzMoKXmsTZXd4JT9M4mdPhJrM-UQwLpWCvWK1VnN7S6hBGpsMBk-WxLre3bb9zGgNRCCk0fZSWzDBilfMPM7
-
-
+#
+#
 # 2. POST /api/create_remote_task
 # Content-Type: application/json
 #

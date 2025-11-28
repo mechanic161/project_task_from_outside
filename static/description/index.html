@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Custom module for automatic tasks creation.</title>
+</head>
+<body>
+
+<h3>Health check:</h3>
+<pre><code>
+https://test.krp-crm.site/api/health
+</code></pre>
+<h3>1. Get auth cookie:</h3>
+<pre><code>
+url = 'https://test.krp-crm.site/web/session/authenticate'
+</code></pre>
+<pre><code>
+body = {
+    "jsonrpc": "2.0",
+    "method": "call",
+    "params": {
+        "db": "odoo_db",
+        "login": "user_name",
+        "password": "user_password",
+    }
+}
+</code></pre>
+
+<h4>get from "Set-Cookie" headers:</h4>
+<pre><code>
+headers["Set-Cookie"] : session_id=EzMoKXm...; Expires=Thu, 26 Nov 2026 10:47:44 GMT; Max-Age=604800; HttpOnly; Path=/
+</code></pre>
+<pre><code>
+req_result = requests.post(url=url, json=body)
+h_cookie = req_result.headers.get('Set-Cookie')
+h_cookie_sid = cook.split(';')[0]
+</code></pre><br/>
+
+and put to other requests headers:<br/>
+<pre><code>
+Cookie: session_id=EzMoKXms...
+</code></pre>
+
+<h3>2. POST https://test.krp-crm.site/api/create_remote_task</h3>
+<pre><code>
+Content-Type: application/json
+
+{
+    "jsonrpc": "2.0",
+    "method": "call",
+    "params": {
+        "name": "Task name",
+        "project_id": 1,
+        "description": "This text will go to Вхідні дані",
+        "attachments": [
+            {
+            "filename": "image.png",
+            "mimetype": "image/png",
+            "data": "iVBORiAGPcegd8..." // file converted to base64
+            }
+        ]
+    }
+}
+    </code></pre>
+</body>
+</html>
