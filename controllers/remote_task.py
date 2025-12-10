@@ -1,7 +1,9 @@
 from odoo import http
 from odoo.http import request
 from odoo.tools import config
+import logging
 
+_logger = logging.getLogger(__name__)
 
 class RemoteTaskController(http.Controller):
 
@@ -46,25 +48,39 @@ class RemoteTaskController(http.Controller):
     @http.route(route='/api/health', type='http', auth='user', methods=['GET'])
     def health(self):
         pick = request.env['ir.attachment'].search([('id', '=', '11277')])
-
         return f"<img src='{pick.image_src}' alt='It`s Alive!'/>"
 
-    @http.route(route='/api/update_lists', type='http', auth='user', methods=['GET'])
-    def update_lists(self):
-        setting = request.env['project.unit.settings'].search([])
+
+    @http.route(route='/api/update_lists', type='json', auth='user', methods=['POST'], csrf=False)
+    def update_lists(self,  **payload):
+
+        table_name = payload['table_name']
+
+        if not table_name:
+            return request.make_response(data="error", status=404)
 
         try:
-            setting.get_units_data()
-            setting.get_data_type_data()
-            setting.get_docs_folders()
-            setting.get_doc_sources_data()
-            setting.get_out_docs_folders()
-            return request.make_response(data="ok", status=200)
+            setting = request.env['project.unit.settings'].search([])
+            match table_name:
+                case 'DivisionROV':
+                    setting.get_units_data()
+                    return request.make_response(data="ok", status=200)
+                case 'Task_description':
+                    setting.get_data_type_data()
+                    return request.make_response(data="ok", status=200)
+                case 'Source':
+                    setting.get_doc_sources_data()
+                    return request.make_response(data="ok", status=200)
+                case 'document_type':
+                    setting.get_docs_folders()
+                    return request.make_response(data="ok", status=200)
+                case 'output_documents':
+                    setting.get_out_docs_folders()
+                    return request.make_response(data="ok", status=200)
+                case _:
+                    return request.make_response(data="not found", status=404)
         except Exception as ex:
             return request.make_response(data=ex.args, status=500)
-
-
-
 
 # 1. Get auth cookie:
 # url = 'https://test.krp-crm.site/web/session/authenticate'
